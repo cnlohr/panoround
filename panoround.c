@@ -15,7 +15,7 @@ int * framenos;
 
 int framepxct = 2;
 int pxspacing = 0;
-int norot90 = 1;
+int norot90 = 0;
 
 #define FRAMEPXCT framepxct
 #define PXSPACING pxspacing
@@ -122,22 +122,39 @@ int main( int argc, char ** argv )
 	printf( "Video out file: %s\n", video_ppm );
 	f = fopen( video_ppm, "wb" );
 	fprintf( f, "P6\n%d %d\n255\n", maxframe*FRAMEPXCT, gwidth );
-#ifdef NOROT90
-	for( line = 0; line < gwidth; line++ )
-#else
-	for( line = gwidth-1; line >= 0; line-- )
-#endif
+	if( norot90 )
 	{
-		int x;
-		for( x = 0; x < maxframe*FRAMEPXCT; x++ )
+		for( line = 0; line < gwidth; line++ )
 		{
-			unsigned char px[3];
-			px[0] = bigframedata[(x+line*MAXFRAMES)*3+0];
-			px[1] = bigframedata[(x+line*MAXFRAMES)*3+1];
-			px[2] = bigframedata[(x+line*MAXFRAMES)*3+2];
-			fwrite( px, 1, 3, f );
+			int x;
+			for( x = 0; x < maxframe*FRAMEPXCT; x++ )
+			{
+				unsigned char px[3];
+				px[0] = bigframedata[(x+line*MAXFRAMES)*3+0];
+				px[1] = bigframedata[(x+line*MAXFRAMES)*3+1];
+				px[2] = bigframedata[(x+line*MAXFRAMES)*3+2];
+				fwrite( px, 1, 3, f );
+			}
 		}
 	}
+	else
+	{
+		for( line = gwidth-1; line >= 0; line-- )
+		{
+			int x;
+			for( x = 0; x < maxframe*FRAMEPXCT; x++ )
+			{
+				unsigned char px[3];
+				px[0] = bigframedata[(x+line*MAXFRAMES)*3+0];
+				px[1] = bigframedata[(x+line*MAXFRAMES)*3+1];
+				px[2] = bigframedata[(x+line*MAXFRAMES)*3+2];
+				fwrite( px, 1, 3, f );
+			}
+		}
+
+
+	}
+
 	fclose( f );
 
 }
